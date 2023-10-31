@@ -15,7 +15,7 @@ section.has-light-background, section.has-light-background h1, section.has-light
  *********************************************/
 :root {
   text-transform: uppercase;
-  --r-background-color: #a1deff;
+  --r-background-color: #fff;
   --r-main-font: 'Montserrat', Helvetica, sans-serif;
   --r-main-font-size: 42px;
   --r-main-color: #000000;
