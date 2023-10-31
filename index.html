@@ -127,7 +127,7 @@
             </section>
 
 		<section style="top: 206px; display: block;" class="present" data-autoslide="5000">
-				<h2 style="white-space: nowrap; display: inline-block;">visualizando.ar/arte</h2>
+				<h2 style="white-space: nowrap; display: block;">visualizando.ar/arte</h2>
 			<img src="qr.jpg" width="400px">
                 
 		</section>
@@ -209,6 +209,14 @@
             "Algo es algo",
             "¡Felicitaciones!",
         ]).domain([0,1])
+
+
+        const alerta = d3.scaleQuantize().range([
+            "Preparate para tirar de la soga!",
+            "Arranca en 2023!",
+            "3..2..1..",
+            ]).domain([2012,2023])
+
 
         const colores = d3.scaleLinear().range([
             "#A70226",
@@ -293,7 +301,7 @@
                     .ticks(width / 80)
                     .tickSizeOuter(0)
                     .tickFormat((d) => d)
-                    .ticks(10)
+                    .tickValues([2007,2011,2015,2019,2023,2027,2031,2035,2039,2043,2047])
             )
             .call((g) => g.select(".domain").remove())
             ;
@@ -320,7 +328,17 @@
                     .attr("text-anchor", "start")
             );
 
-        // Append a path for the line.
+            svg.append("line")
+            .attr("stroke-width", 3)
+            .attr("stroke", "orange")
+            .style("stroke-dasharray", ("3, 3"))
+            .attr("x1", x(2023))
+            .attr("x2", x(2023))
+            .attr("y1", y(y.domain()[0]))
+            .attr("y2", y(y.domain()[1]-0.3))
+
+   
+            // Append a path for the line.
         var lineaCambiante = svg
             .append("path")
             .attr("fill", "none")
@@ -387,9 +405,19 @@
             .attr("y", y(curvaIntermedia(2050, input)))
             .attr("dy", 25)
 
+        var labelAlerta = svg
+            .append("text")
+            .attr("class", "textoGraph")
+            .attr("fill", "Orange")
+            .text("Preparate para tirar de la soga!")
+            .attr("opacity", 0)
+            .style("font-size", "0.4em")
+            .attr("x", x(2005))
+            .attr("y", y(curvaIntermedia(2050, input)));
+
 
         var anioLabel = svg.append("g")
-            .attr("transform", `translate(${x(start + 10) + 4},${y(y.domain()[0]) - 20})`)
+            .attr("transform", `translate(${x(start + 5) + 4},${y(y.domain()[0]) - 20})`)
 
 
         anioLabel.append("rect")
@@ -399,7 +427,7 @@
 
         var anioLabelLabel = anioLabel.append("text")
             .attr("fill", "black")
-            .text(start + 10)
+            .text(start + 5)
             .attr("dx", 5)
             .style("font-weight", 600)
 
@@ -407,19 +435,20 @@
         var timeLine = svg.append("line")
             .attr("stroke-width", 6)
             .attr("stroke", "black")
-            .attr("x1", x(start + 10))
-            .attr("x2", x(start + 10))
+            .attr("x1", x(start + 5))
+            .attr("x2", x(start + 5))
             .attr("y1", y(y.domain()[0]) - 3)
-            .attr("y2", y(curvaHist(start + 10)))
+            .attr("y2", y(curvaHist(start + 5)))
 
+   
 
         var circulo = svg.append("circle")
             .attr("r", 14)
             .attr("stroke-width", ancho)
             .attr("stroke", "black")
             .attr("fill", "white")
-            .attr("cx", x(start + 10))
-            .attr("cy", y(curvaHist(start + 10)))
+            .attr("cx", x(start + 5))
+            .attr("cy", y(curvaHist(start + 5)))
 
 
             ;
@@ -435,8 +464,11 @@
                     .clamp(true)
 
 
+    
+
+                        
         // TRAE EL DATO DE MQTT
-        var i = start+10;
+        var i = start+5;
         
         Reveal.on('slidetransitionend', event => {
             console.log(event.currentSlide.id)
@@ -500,10 +532,18 @@
                                 .attr("x2", x(anio))
                                 .attr("y2", y(curvaHist(anio)))
 
+                             labelAlerta.text(alerta(anio)).transition()
+                                .duration(300)
+                                        .attr("opacity",1)
+                     
 
 
                             break;
                         case anio > inicio:
+
+                        labelAlerta.text(alerta(anio)).transition()
+                                .duration(300)
+                                        .attr("opacity", 0)
 
                             circulo.transition()
                                 .duration(800)
@@ -541,7 +581,7 @@
                 }
 
             } else {
-                i = start+10;
+                i = start+5;
                 console.log("salimos",i)
                 circulo
                                 .attr("cx", x(i))
